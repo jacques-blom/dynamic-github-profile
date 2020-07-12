@@ -25,8 +25,8 @@ const END_COMMENT = '<!-- YT LIST END -->'
 
 const roundedCorners = Buffer.from('<svg><rect x="0" y="0" width="300" height="169" rx="20" ry="20"/></svg>')
 
-const generateThumbnail = async (id, index) => {
-    const imageResponse = await axios.get(`https://img.youtube.com/vi/${id}/maxresdefault.jpg`, {
+const generateThumbnail = async (video) => {
+    const imageResponse = await axios.get(`https://img.youtube.com/vi/${video.id.videoId}/maxresdefault.jpg`, {
         responseType: 'arraybuffer',
     })
 
@@ -42,6 +42,15 @@ const generateThumbnail = async (id, index) => {
         .toBuffer()
 }
 
+const getAssetsDir = async () => {
+    try {
+        const assetsDir = await ghRepo.contentsAsync('assets')
+        return assetsDir[0]
+    } catch (error) {
+        return []
+    }
+}
+
 const run = async () => {
     // Get the latest YouTube videos for your channel
     const response = await axios.get(
@@ -52,23 +61,19 @@ const run = async () => {
     const divider = `\n<img align="center" width="100%" height="0" />\n`
 
     // Generate thumbnail images
-    const thumbnails = await Promise.all(latestVideos.map((video, index) => generateThumbnail(video.id.videoId, index)))
+    const thumbnails = await Promise.all(latestVideos.map(generateThumbnail))
 
-    let assetsDir = null
-    try {
-        assetsDir = await ghRepo.contentsAsync('assets')
-        assetsDir = assetsDir[0]
-    } catch (error) {
-        assetsDir = []
-    }
+    // Upload the thumbnail images
+    const assetsDir = await getAssetsDir()
+    for (let index = 0; index++; index < latestVideos.length) {
+        const path = `assets/${index}.png`
+        const existingFile = assetsDir.find((asset) => asset.path === path)
+        const imageBuffer = thumbnails[index]
 
-    for (let i = 0; i < latestVideos.length; i++) {
-        const existingFileAtPath = assetsDir.find((asset) => asset.name === `${i}.png`)
-        console.log(existingFileAtPath)
-        if (existingFileAtPath) {
-            await ghRepo.updateContentsAsync(`assets/${i}.png`, 'Add thumbnail', thumbnails[i], existingFileAtPath.sha)
+        if (existingFile) {
+            await ghRepo.updateContentsAsync(path, 'Add thumbnail', imageBuffer, existingFile.sha)
         } else {
-            await ghRepo.createContentsAsync(`assets/${i}.png`, 'Add thumbnail', thumbnails[i])
+            await ghRepo.createContentsAsync(path, 'Add thumbnail', imageBuffer)
         }
     }
 
@@ -77,8 +82,9 @@ const run = async () => {
         const id = video.id.videoId
         const title = video.snippet.title.split('|')[0]
         const date = dateFormat(new Date(video.snippet.publishedAt), 'dd mmm yyyy')
+        const thumbnail = `https://raw.githubusercontent.com/${process.env.GITHUB_REPO}/master/assets/${index}.png`
 
-        return `[<img src="assets/${index}.png" align="left" width="200" />](https://www.youtube.com/watch?v=${id})
+        return `[<img src="${thumbnail}" align="left" width="200" />](https://www.youtube.com/watch?v=${id})
         **[${title}](https://www.youtube.com/watch?v=${id})**
         <br /> *${date}*`
     })
