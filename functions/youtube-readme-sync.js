@@ -65,7 +65,7 @@ const run = async () => {
 
     // Upload the thumbnail images
     const assetsDir = await getAssetsDir()
-    for (let index = 0; index++; index < latestVideos.length) {
+    for (let index = 0; index < latestVideos.length; index++) {
         const path = `assets/${index}.png`
         const existingFile = assetsDir.find((asset) => asset.path === path)
         const imageBuffer = thumbnails[index]
