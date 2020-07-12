@@ -1,6 +1,7 @@
 const axios = require('axios').default
 const queryString = require('query-string')
 const github = require('octonode')
+const dateFormat = require('dateformat')
 
 const ghClient = github.client({
     username: process.env.GITHUB_USERNAME,
@@ -34,9 +35,12 @@ const run = async () => {
     const videoRows = latestVideos.map((video) => {
         const id = video.id.videoId
         const title = video.snippet.title.split('|')[0]
+        const date = dateFormat(new Date(video.snippet.publishedAt), 'dd mmm yyyy')
 
         // prettier-ignore
-        return `[<img src="https://img.youtube.com/vi/${id}/maxresdefault.jpg" align="left" width="200" />](https://www.youtube.com/watch?v=${id}) **[${title}](https://www.youtube.com/watch?v=${id})**`
+        return `[<img src="https://img.youtube.com/vi/${id}/maxresdefault.jpg" align="left" width="200" />](https://www.youtube.com/watch?v=${id})
+        **[${title}](https://www.youtube.com/watch?v=${id})**
+        <br /> *${date}*`
     })
 
     const newList = `${START_COMMENT}\n${videoRows.join(divider)}\n${END_COMMENT}`
