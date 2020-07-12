@@ -23,6 +23,14 @@ const YT_SEARCH_PARAMS = {
 const START_COMMENT = '<!-- YT LIST START -->'
 const END_COMMENT = '<!-- YT LIST END -->'
 
+const overlay = Buffer.from(`
+<svg>
+    <rect fill-opacity="0.49" fill="#00152C" x="0" y="0" width="300" height="169"></rect>
+    <rect fill="#FFFFFF" x="140" y="71" width="22" height="27"></rect>
+    <path d="M149.477998,59 C149.477998,59 127.28759,59 121.718093,60.4563442 C118.735992,61.2948195 116.280463,63.7658426 115.447228,66.8108627 C114,72.4154459 114,84.022077 114,84.022077 C114,84.022077 114,95.6727688 115.447228,101.189139 C116.280463,104.234117 118.692136,106.66101 121.718093,107.499506 C127.331445,109 149.477998,109 149.477998,109 C149.477998,109 171.712398,109 177.28178,107.543658 C180.307758,106.70518 182.719382,104.322408 183.508767,101.233291 C185,95.6727829 185,84.0662295 185,84.0662295 C185,84.0662295 185.043692,72.4154459 183.508767,66.8108627 C182.719382,63.7658426 180.307758,61.3390077 177.28178,60.5446493 C171.712398,59 149.477998,59 149.477998,59 Z M143,74 L162,84.0206292 L143,94 L143,74 L143,74 Z" fill="#FF0000" fill-rule="nonzero"></path>
+</svg>
+`)
+
 const roundedCorners = Buffer.from('<svg><rect x="0" y="0" width="300" height="169" rx="20" ry="20"/></svg>')
 
 const generateThumbnail = async (video) => {
@@ -32,7 +40,11 @@ const generateThumbnail = async (video) => {
 
     return sharp(imageResponse.data)
         .resize(300, 169, {fit: 'fill'})
+        .blur(4)
         .composite([
+            {
+                input: overlay,
+            },
             {
                 input: roundedCorners,
                 blend: 'dest-in',
