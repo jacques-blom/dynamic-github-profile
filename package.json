@@ -7,7 +7,7 @@
     "license": "MIT",
     "private": false,
     "scripts": {
-        "test": "LOCAL_TEST=true node functions/youtube-readme-sync.js"
+        "youtube": "LOCAL_TEST=true node functions/youtube-readme-sync.js"
     },
     "devDependencies": {
         "prettier": "^2.0.5"
