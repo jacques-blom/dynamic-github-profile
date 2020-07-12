@@ -16,6 +16,7 @@
         "axios": "^0.19.2",
         "dateformat": "^3.0.3",
         "octonode": "^0.9.5",
-        "query-string": "^6.13.1"
+        "query-string": "^6.13.1",
+        "sharp": "^0.25.4"
     }
 }

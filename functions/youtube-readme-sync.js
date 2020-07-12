@@ -2,6 +2,7 @@ const axios = require('axios').default
 const queryString = require('query-string')
 const github = require('octonode')
 const dateFormat = require('dateformat')
+const sharp = require('sharp')
 
 const ghClient = github.client({
     username: process.env.GITHUB_USERNAME,
@@ -22,6 +23,25 @@ const YT_SEARCH_PARAMS = {
 const START_COMMENT = '<!-- YT LIST START -->'
 const END_COMMENT = '<!-- YT LIST END -->'
 
+const roundedCorners = Buffer.from('<svg><rect x="0" y="0" width="300" height="169" rx="20" ry="20"/></svg>')
+
+const generateThumbnail = async (id, index) => {
+    const imageResponse = await axios.get(`https://img.youtube.com/vi/${id}/maxresdefault.jpg`, {
+        responseType: 'arraybuffer',
+    })
+
+    return sharp(imageResponse.data)
+        .resize(300, 169, {fit: 'fill'})
+        .composite([
+            {
+                input: roundedCorners,
+                blend: 'dest-in',
+            },
+        ])
+        .png()
+        .toBuffer()
+}
+
 const run = async () => {
     // Get the latest YouTube videos for your channel
     const response = await axios.get(
@@ -31,14 +51,34 @@ const run = async () => {
 
     const divider = `\n<img align="center" width="100%" height="0" />\n`
 
+    // Generate thumbnail images
+    const thumbnails = await Promise.all(latestVideos.map((video, index) => generateThumbnail(video.id.videoId, index)))
+
+    let assetsDir = null
+    try {
+        assetsDir = await ghRepo.contentsAsync('assets')
+        assetsDir = assetsDir[0]
+    } catch (error) {
+        assetsDir = []
+    }
+
+    for (let i = 0; i < latestVideos.length; i++) {
+        const existingFileAtPath = assetsDir.find((asset) => asset.name === `${i}.png`)
+        console.log(existingFileAtPath)
+        if (existingFileAtPath) {
+            await ghRepo.updateContentsAsync(`assets/${i}.png`, 'Add thumbnail', thumbnails[i], existingFileAtPath.sha)
+        } else {
+            await ghRepo.createContentsAsync(`assets/${i}.png`, 'Add thumbnail', thumbnails[i])
+        }
+    }
+
     // Generate the table
-    const videoRows = latestVideos.map((video) => {
+    const videoRows = latestVideos.map((video, index) => {
         const id = video.id.videoId
         const title = video.snippet.title.split('|')[0]
         const date = dateFormat(new Date(video.snippet.publishedAt), 'dd mmm yyyy')
 
-        // prettier-ignore
-        return `[<img src="https://img.youtube.com/vi/${id}/maxresdefault.jpg" align="left" width="200" />](https://www.youtube.com/watch?v=${id})
+        return `[<img src="assets/${index}.png" align="left" width="200" />](https://www.youtube.com/watch?v=${id})
         **[${title}](https://www.youtube.com/watch?v=${id})**
         <br /> *${date}*`
     })
