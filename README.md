@@ -10,7 +10,7 @@ I created this to make my GitHub profile a bit more dynamic and interesting, and
 
 Check out the video for a run-through of the code, and setup instructions:
 
-<a href="https://youtu.be/9JVE8OGRSlA"><img alt="Click here for the tutorial video" src="https://raw.githubusercontent.com/jacques-blom/dynamic-github-profile/main/video.png" width="300" /></a>
+<a href="https://youtu.be/z6qmP6JJvz8"><img alt="Click here for the tutorial video" src="https://raw.githubusercontent.com/jacques-blom/dynamic-github-profile/main/video.png" width="300" /></a>
 
 ## Written instructions
 
@@ -25,9 +25,9 @@ Check out the video for a run-through of the code, and setup instructions:
 <!-- YT LIST END -->
 ```
 
-4. Deploy the forked repo to Netlify (full walkthrough in [the video](https://youtu.be/9JVE8OGRSlA))
+4. Deploy the forked repo to Netlify (full walkthrough in [the video](https://youtu.be/z6qmP6JJvz8))
 
-5. Set the following environment variables in your Netlify project settings (more info on how to create these in [the video](https://youtu.be/9JVE8OGRSlA))
+5. Set the following environment variables in your Netlify project settings (more info on how to create these in [the video](https://youtu.be/z6qmP6JJvz8))
 
 ```
 GITHUB_REPO=your-username/your-username
