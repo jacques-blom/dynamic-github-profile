@@ -107,7 +107,7 @@ const run = async () => {
         <br /> *${date}*`
     })
 
-    const newList = `${START_COMMENT}\n${videoRows.join(divider)}\n${END_COMMENT}`
+    const newList = `${START_COMMENT}\n${videoRows.join(divider)}${divider}${END_COMMENT}`
 
     // Get the current README.md
     const [readme] = await ghRepo.readmeAsync()
