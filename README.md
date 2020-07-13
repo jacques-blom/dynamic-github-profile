@@ -1,4 +1,4 @@
-# 📺 YouTube -> GitHub Readme Sync
+# 📺 YouTube ➡️ GitHub Readme Sync
 
 <img alt="Example screenshot, showing YouTube videos listed on my GitHub profile" src="https://raw.githubusercontent.com/jacques-blom/dynamic-github-profile/main/screenshot.jpg" width="1174" />
 
