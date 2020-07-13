@@ -42,4 +42,6 @@ GOOGLE_API_KEY=your-google-api-key
 
 7. Set up a [YouTube webhook](https://developers.google.com/youtube/v3/guides/push_notifications) using Google's PubSubHubbub service
 
+    Use the following for Topic URL: `https://www.youtube.com/feeds/videos.xml?channel_id=XXXXX`
+
 8. Et voilà! ✨
