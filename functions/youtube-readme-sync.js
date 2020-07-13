@@ -77,16 +77,20 @@ const run = async () => {
 
     // Upload the thumbnail images
     const assetsDir = await getAssetsDir()
+    const thumbnailCommitHashes = []
     for (let index = 0; index < latestVideos.length; index++) {
         const path = `assets/${index}.png`
         const existingFile = assetsDir.find((asset) => asset.path === path)
         const imageBuffer = thumbnails[index]
 
+        let response
         if (existingFile) {
-            await ghRepo.updateContentsAsync(path, 'Add thumbnail', imageBuffer, existingFile.sha)
+            response = await ghRepo.updateContentsAsync(path, 'Add thumbnail', imageBuffer, existingFile.sha)
         } else {
-            await ghRepo.createContentsAsync(path, 'Add thumbnail', imageBuffer)
+            response = await ghRepo.createContentsAsync(path, 'Add thumbnail', imageBuffer)
         }
+
+        thumbnailCommitHashes.push(response[0].commit.sha)
     }
 
     // Generate the table
@@ -94,7 +98,9 @@ const run = async () => {
         const id = video.id.videoId
         const title = video.snippet.title.split('|')[0]
         const date = dateFormat(new Date(video.snippet.publishedAt), 'dd mmm yyyy')
-        const thumbnail = `https://raw.githubusercontent.com/${process.env.GITHUB_REPO}/master/assets/${index}.png`
+        // Reference a specific commit to avoid caching issues and needing to specify the name of your base branch
+        const commit = thumbnailCommitHashes[index]
+        const thumbnail = `https://raw.githubusercontent.com/${process.env.GITHUB_REPO}/${commit}/assets/${index}.png`
 
         return `[<img src="${thumbnail}" align="left" width="200" />](https://www.youtube.com/watch?v=${id})
         **[${title}](https://www.youtube.com/watch?v=${id})**
